@@ -1,11 +1,11 @@
-from typing import Literal, Union
+from typing import Literal
 
 import lightning as L
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class DummyModelConfig(BaseModel):
@@ -15,23 +15,6 @@ class DummyModelConfig(BaseModel):
     input_size: int
     output_size: int
     lr: float
-
-
-class AdvancedModelConfig(DummyModelConfig):
-    """Advanced model configuration with additional parameters."""
-
-    model_type: Literal["advanced"] = "advanced"
-    hidden_size: int = 64
-    dropout_rate: float = 0.1
-    activation: str = "relu"
-
-
-class CustomModelConfig(DummyModelConfig):
-    """Custom model configuration with custom parameters."""
-
-    model_type: Literal["custom"] = "custom"
-    custom_param1: str = "default"
-    custom_param2: int = 42
 
 
 class DummyModel(nn.Module):

@@ -1,0 +1,12 @@
+# Example configuration using the base DummyModelConfig
+model:
+  model_type: "dummy"
+  input_size: 10
+  output_size: 10
+  lr: 0.001
+
+trainer:
+  accelerator: "cpu"
+  strategy: "ddp"
+  devices: 2
+  max_epochs: 10

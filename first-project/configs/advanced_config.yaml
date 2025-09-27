@@ -1,0 +1,15 @@
+# Example configuration using the AdvancedModelConfig subclass
+model:
+  model_type: "advanced"
+  input_size: 20
+  output_size: 5
+  lr: 0.01
+  hidden_size: 128
+  dropout_rate: 0.2
+  activation: "gelu"
+
+trainer:
+  accelerator: "cpu"
+  strategy: "fsdp"
+  devices: 4
+  max_epochs: 20

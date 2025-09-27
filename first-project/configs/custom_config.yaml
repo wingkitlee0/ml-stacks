@@ -1,0 +1,14 @@
+# Example configuration using the CustomModelConfig subclass
+model:
+  model_type: "custom"
+  input_size: 15
+  output_size: 8
+  lr: 0.005
+  custom_param1: "special_value"
+  custom_param2: 100
+
+trainer:
+  accelerator: "cpu"
+  strategy: "deepspeed"
+  devices: 1
+  max_epochs: 5
