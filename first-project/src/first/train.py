@@ -4,24 +4,23 @@ import os
 from datetime import datetime
 from typing import Optional
 
-from lightning.pytorch.profilers import PyTorchProfiler
-
 os.environ["RAY_TRAIN_V2_ENABLED"] = "1"  # noqa: E402
 
 
 import lightning as L
 import ray
 import torch
-from ray.train import CheckpointConfig, RunConfig
+from lightning.pytorch.profilers import PyTorchProfiler
+from ray.train import CheckpointConfig, RunConfig, ScalingConfig
 from ray.train.lightning import (
     RayLightningEnvironment,
     RayTrainReportCallback,
 )
 from ray.train.torch import TorchTrainer
 
-from first.combined import TrainLoopConfig, load_and_validate_config_dict
+from first.configs import TrainLoopConfig, load_and_validate_config_dict
+from first.data import create_train_val_datasets
 from first.model import create_model
-from first.utils.configs import TrainerConfig
 
 
 def get_datetime_str() -> str:
@@ -42,7 +41,7 @@ def train_func(config_dict):
 
     model = create_model(train_config.model)
 
-    trainer_config: TrainerConfig = train_config.trainer
+    trainer_config = train_config.trainer
     trainer = L.Trainer(
         accelerator=trainer_config.accelerator,
         strategy=trainer_config.get_strategy,
@@ -60,8 +59,7 @@ def train_func(config_dict):
         max_epochs=trainer_config.max_epochs,
     )
 
-    train_ds = create_dataset("train")
-    val_ds = create_dataset("val")
+    train_ds, val_ds = create_train_val_datasets()
 
     train_dataloader = train_ds.iter_torch_batches(batch_size=10)
     val_dataloader = val_ds.iter_torch_batches(batch_size=10)
@@ -82,10 +80,9 @@ def main(config_path: Optional[str] = None, datetime_str: Optional[str] = None):
     print(TrainLoopConfig.model_validate(config_dict))
 
     trainer = TorchTrainer(
-        train_func,
-        # Use the validated dictionary
+        train_loop_per_worker=train_func,
         train_loop_config=config_dict,
-        # scaling_config=ScalingConfig(num_workers=2),
+        scaling_config=ScalingConfig(num_workers=2),
         run_config=RunConfig(
             name=f"first_{datetime_str}",
             storage_path="/tmp/ray_checkpoints/",
@@ -108,7 +105,7 @@ if __name__ == "__main__":
         "-dt",
         type=str,
         help="Datetime string",
-        default=get_datetime_str,
+        default=get_datetime_str(),
     )
     args = parser.parse_args()
 

@@ -6,7 +6,7 @@ from pydantic import BaseModel, Discriminator, Tag
 from first.model.advanced import AdvancedModelConfig
 from first.model.custom import CustomModelConfig
 from first.model.dummy import DummyModelConfig
-from first.utils.configs import TrainerConfig
+from first.utils.trainer_config import TrainerConfig
 
 
 def load_config_dict_from_yaml(yaml_path: str) -> dict:
